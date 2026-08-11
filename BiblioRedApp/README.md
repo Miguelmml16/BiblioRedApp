@@ -8,23 +8,16 @@ persistente (Reto 1) e info del usuario en el Drawer (Reto 2).
 - Node.js instalado (https://nodejs.org — versión LTS).
 - La app **Expo Go** en tu celular (Play Store / App Store), o un emulador.
 
-## Instalación (desde cero, versión-segura)
+## Instalación
 
-1. Crear el proyecto base:
-   ```
-   npx create-expo-app@latest BancoLibroApp --template blank
-   cd BancoLibroApp
-   ```
+Este repositorio ya incluye `package.json`, `app.json` y `assets/` — es un proyecto Expo completo y listo para ejecutar.
 
-2. Instalar dependencias (Expo elige versiones compatibles):
+1. Instalar dependencias:
    ```
-   npx expo install @react-navigation/native @react-navigation/native-stack @react-navigation/bottom-tabs @react-navigation/drawer react-native-screens react-native-safe-area-context react-native-gesture-handler react-native-reanimated @react-native-async-storage/async-storage expo-sqlite
+   npm install
    ```
 
-3. Copiar dentro del proyecto el archivo `App.js` y la carpeta `src/` de este ZIP
-   (reemplaza el `App.js` que viene por defecto).
-
-4. Ejecutar:
+2. Ejecutar:
    ```
    npx expo start
    ```
@@ -35,16 +28,13 @@ persistente (Reto 1) e info del usuario en el Drawer (Reto 2).
 - Contraseña: `1234`
 (Se crea solo en SQLite la primera vez que abre la app.)
 
-## Si aparece un error de "worklets" al abrir
-Ejecuta y reinicia limpiando caché:
-```
-npx expo install react-native-worklets
-npx expo start -c
-```
-
 ## Estructura
 ```
 App.js
+index.js
+app.json
+package.json
+assets/
 src/
   database/db.js          -> SQLite: tabla usuarios, validar login
   context/AuthContext.js  -> sesión, login/logout, persistencia (Reto 1)
