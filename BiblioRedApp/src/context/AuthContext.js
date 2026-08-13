@@ -1,55 +1,45 @@
-// Contexto de autenticación: guarda el usuario logueado y expone login/logout.
-// Reto 1: la sesión se guarda en AsyncStorage y se restaura al abrir la app.
+// Contexto de autenticación: sesión contra el backend real de Django.
+// La app funciona sin sesión (los 5 módulos son de lectura pública); el
+// login solo se exige para poder crear registros (requiere cuenta staff).
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { initDB, validarUsuario } from '../database/db';
+import { login as loginRequest, logout as logoutRequest, restoreProfile } from '../services/api';
 
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
-
-const SESION_KEY = 'sesion_activa';
 
 export function AuthProvider({ children }) {
   const [usuario, setUsuario] = useState(null);
   const [cargando, setCargando] = useState(true);
 
-  // Al iniciar la app: preparar BD y restaurar sesión guardada (Reto 1).
+  // Al iniciar la app: restaurar el perfil guardado localmente (si lo hay).
+  // La cookie de sesión viaja aparte y se valida en la primera petición
+  // autenticada real (crear un registro); si expiró, esa acción devolverá
+  // un error 401/403 que la pantalla mostrará y pedirá reautenticación.
   useEffect(() => {
     (async () => {
       try {
-        await initDB();
-        const guardada = await AsyncStorage.getItem(SESION_KEY);
-        if (guardada) {
-          setUsuario(JSON.parse(guardada));
-        }
+        const perfil = await restoreProfile();
+        if (perfil) setUsuario(perfil);
       } catch (e) {
-        console.log('Error inicializando:', e);
+        console.log('Error restaurando sesión:', e);
       } finally {
         setCargando(false);
       }
     })();
   }, []);
 
-  // Login: valida contra SQLite y persiste la sesión.
-  const login = async (user, pass) => {
-    const encontrado = await validarUsuario(user, pass);
-    if (encontrado) {
-      setUsuario(encontrado);
-      await AsyncStorage.setItem(SESION_KEY, JSON.stringify(encontrado));
-      return { ok: true };
-    }
-    return { ok: false, mensaje: 'Usuario o contraseña incorrectos' };
+  const login = async (usuarioTexto, password) => {
+    const res = await loginRequest(usuarioTexto, password);
+    if (res.ok) setUsuario(res.usuario);
+    return res;
   };
 
-  // Logout: limpia estado y sesión persistida.
   const logout = async () => {
+    await logoutRequest();
     setUsuario(null);
-    await AsyncStorage.removeItem(SESION_KEY);
   };
 
   return (
-    <AuthContext.Provider value={{ usuario, cargando, login, logout }}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={{ usuario, cargando, login, logout }}>{children}</AuthContext.Provider>
   );
 }

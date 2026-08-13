@@ -1,16 +1,19 @@
-// Pantalla de Login. Valida contra SQLite mediante el AuthContext.
+// Pantalla de Login. Autentica contra la sesión de Django (solo cuentas
+// staff pueden iniciar sesión; ver src/services/api.js).
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   KeyboardAvoidingView, Platform, ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 import { useAuth } from '../context/AuthContext';
 import { colors } from '../theme/colors';
 
 export default function LoginScreen() {
   const { login } = useAuth();
+  const navigation = useNavigation();
   const [usuario, setUsuario] = useState('');
   const [password, setPassword] = useState('');
   const [verPass, setVerPass] = useState(false);
@@ -26,8 +29,12 @@ export default function LoginScreen() {
     setCargando(true);
     const res = await login(usuario.trim(), password);
     setCargando(false);
-    if (!res.ok) setError(res.mensaje);
-    // Si es correcto, RootNavigator cambia solo a la app principal.
+    if (!res.ok) {
+      setError(res.mensaje);
+      return;
+    }
+    if (navigation.canGoBack()) navigation.goBack();
+    else navigation.replace('Main');
   };
 
   return (
@@ -36,6 +43,12 @@ export default function LoginScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+        {navigation.canGoBack() && (
+          <TouchableOpacity style={styles.cerrar} onPress={() => navigation.goBack()}>
+            <Ionicons name="close" size={26} color="#fff" />
+          </TouchableOpacity>
+        )}
+
         {/* Logo / cabecera */}
         <View style={styles.logoBox}>
           <View style={styles.logoCirc}>
@@ -84,7 +97,7 @@ export default function LoginScreen() {
             <Text style={styles.botonText}>{cargando ? 'Verificando...' : 'Ingresar'}</Text>
           </TouchableOpacity>
 
-          <Text style={styles.hint}>Usuario de prueba:  admin  /  1234</Text>
+          <Text style={styles.hint}>Ingresa con una cuenta staff de Django (panel de administración).</Text>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -94,6 +107,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.primary },
   scroll: { flexGrow: 1, justifyContent: 'center', padding: 24 },
+  cerrar: { position: 'absolute', top: 8, right: 8, padding: 8, zIndex: 1 },
   logoBox: { alignItems: 'center', marginBottom: 26 },
   logoCirc: {
     width: 96, height: 96, borderRadius: 48, backgroundColor: '#ffffff22',

@@ -1,4 +1,7 @@
-// Navegador raíz: si NO hay sesión muestra Login; si hay sesión muestra la app.
+// Navegador raíz: la app SIEMPRE muestra el contenido principal (los 5
+// módulos son de lectura pública en el backend). Login es una pantalla que
+// se puede abrir/cerrar desde el Drawer para desbloquear la creación de
+// registros (requiere cuenta staff de Django).
 import React from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -11,9 +14,9 @@ import { colors } from '../theme/colors';
 const Stack = createNativeStackNavigator();
 
 export default function RootNavigator() {
-  const { usuario, cargando } = useAuth();
+  const { cargando } = useAuth();
 
-  // Mientras se restaura la sesión, mostramos un spinner.
+  // Mientras se restaura el perfil guardado, mostramos un spinner.
   if (cargando) {
     return (
       <View style={styles.center}>
@@ -24,11 +27,8 @@ export default function RootNavigator() {
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {usuario ? (
-        <Stack.Screen name="Main" component={DrawerNavigator} />
-      ) : (
-        <Stack.Screen name="Login" component={LoginScreen} />
-      )}
+      <Stack.Screen name="Main" component={DrawerNavigator} />
+      <Stack.Screen name="Login" component={LoginScreen} options={{ presentation: 'modal' }} />
     </Stack.Navigator>
   );
 }
