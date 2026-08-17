@@ -1,25 +1,24 @@
-// Navegador raíz: la app SIEMPRE muestra el contenido principal (los 5
-// módulos son de lectura pública en el backend). Login es una pantalla que
-// se puede abrir/cerrar desde el Drawer para desbloquear la creación de
-// registros (requiere cuenta staff de Django).
+// Navegador raíz: el panel (DashboardScreen) siempre está visible — los 5
+// recursos son de lectura pública. Login es una pantalla modal que se abre
+// bajo demanda para desbloquear crear/editar/eliminar (requiere staff).
 import React from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import LoginScreen from '../screens/LoginScreen';
-import DrawerNavigator from './DrawerNavigator';
-import { colors } from '../theme/colors';
+import DashboardScreen from '../screens/DashboardScreen';
 
 const Stack = createNativeStackNavigator();
 
 export default function RootNavigator() {
   const { cargando } = useAuth();
+  const { colors } = useTheme();
 
-  // Mientras se restaura el perfil guardado, mostramos un spinner.
   if (cargando) {
     return (
-      <View style={styles.center}>
+      <View style={[styles.center, { backgroundColor: colors.bg }]}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
@@ -27,12 +26,12 @@ export default function RootNavigator() {
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Main" component={DrawerNavigator} />
+      <Stack.Screen name="Main" component={DashboardScreen} />
       <Stack.Screen name="Login" component={LoginScreen} options={{ presentation: 'modal' }} />
     </Stack.Navigator>
   );
 }
 
 const styles = StyleSheet.create({
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.bg },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 });
