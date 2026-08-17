@@ -3,13 +3,19 @@ import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'rea
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 
-export default function Topbar({ refreshing, onRefresh, usuario, onLoginPress, onLogoutPress }) {
-  const { colors, dark, toggle } = useTheme();
+// Tema, sesión y "acerca de" viven en el Drawer (ver CustomDrawerContent);
+// aquí solo quedan acciones propias de esta pantalla (menú y refresco) para
+// no duplicar controles entre el Topbar y el Drawer.
+export default function Topbar({ onMenuPress, refreshing, onRefresh }) {
+  const { colors } = useTheme();
   const styles = getStyles(colors);
 
   return (
     <View style={styles.bar}>
       <View style={styles.brand}>
+        <TouchableOpacity style={styles.iconBtn} onPress={onMenuPress}>
+          <Ionicons name="menu" size={20} color={colors.text} />
+        </TouchableOpacity>
         <View style={styles.logo}>
           <Ionicons name="book" size={22} color="#fff" />
         </View>
@@ -26,15 +32,6 @@ export default function Topbar({ refreshing, onRefresh, usuario, onLoginPress, o
           ) : (
             <Ionicons name="refresh" size={18} color={colors.text} />
           )}
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.iconBtn} onPress={toggle}>
-          <Ionicons name={dark ? 'sunny-outline' : 'moon-outline'} size={18} color={colors.text} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.iconBtn}
-          onPress={usuario ? onLogoutPress : onLoginPress}
-        >
-          <Ionicons name={usuario ? 'log-out-outline' : 'log-in-outline'} size={18} color={colors.text} />
         </TouchableOpacity>
       </View>
     </View>

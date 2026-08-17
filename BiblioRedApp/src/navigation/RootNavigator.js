@@ -1,37 +1,37 @@
-// Navegador raíz: el panel (DashboardScreen) siempre está visible — los 5
-// recursos son de lectura pública. Login es una pantalla modal que se abre
-// bajo demanda para desbloquear crear/editar/eliminar (requiere staff).
-import React from 'react';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
+// Navegador raíz: "Main" es el Drawer que aloja el panel (DashboardScreen),
+// siempre visible — los 5 recursos son de lectura pública. Login es una
+// pantalla modal que se abre bajo demanda para desbloquear crear/editar/
+// eliminar (requiere staff).
+import React, { useEffect, useState } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
 import LoginScreen from '../screens/LoginScreen';
-import DashboardScreen from '../screens/DashboardScreen';
+import SplashScreen from '../screens/SplashScreen';
+import DrawerNavigator from './DrawerNavigator';
 
 const Stack = createNativeStackNavigator();
+const SPLASH_MIN_MS = 1500;
 
 export default function RootNavigator() {
   const { cargando } = useAuth();
-  const { colors } = useTheme();
+  const [tiempoMinimoCumplido, setTiempoMinimoCumplido] = useState(false);
 
-  if (cargando) {
-    return (
-      <View style={[styles.center, { backgroundColor: colors.bg }]}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
-    );
+  // La restauración de sesión (SecureStore local) es casi instantánea; se
+  // fuerza un tiempo mínimo para que el splash con la imagen sea visible.
+  useEffect(() => {
+    const timer = setTimeout(() => setTiempoMinimoCumplido(true), SPLASH_MIN_MS);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (cargando || !tiempoMinimoCumplido) {
+    return <SplashScreen />;
   }
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Main" component={DashboardScreen} />
+      <Stack.Screen name="Main" component={DrawerNavigator} />
       <Stack.Screen name="Login" component={LoginScreen} options={{ presentation: 'modal' }} />
     </Stack.Navigator>
   );
 }
-
-const styles = StyleSheet.create({
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-});

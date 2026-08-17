@@ -22,7 +22,7 @@ import RecordFormModal from '../components/dashboard/RecordFormModal';
 
 export default function DashboardScreen() {
   const { colors } = useTheme();
-  const { usuario, logout } = useAuth();
+  const { usuario } = useAuth();
   const navigation = useNavigation();
   const styles = getStyles(colors);
 
@@ -135,11 +135,9 @@ export default function DashboardScreen() {
   return (
     <View style={styles.container}>
       <Topbar
+        onMenuPress={() => navigation.openDrawer()}
         refreshing={refreshing}
         onRefresh={refrescarTodo}
-        usuario={usuario}
-        onLoginPress={() => navigation.navigate('Login')}
-        onLogoutPress={logout}
       />
 
       <FlatList
