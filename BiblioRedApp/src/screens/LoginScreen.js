@@ -9,11 +9,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
 import { useAuth } from '../context/AuthContext';
-import { colors } from '../theme/colors';
+import { useTheme } from '../context/ThemeContext';
 
 export default function LoginScreen() {
   const { login } = useAuth();
+  const { colors } = useTheme();
   const navigation = useNavigation();
+  const styles = getStyles(colors);
   const [usuario, setUsuario] = useState('');
   const [password, setPassword] = useState('');
   const [verPass, setVerPass] = useState(false);
@@ -52,10 +54,10 @@ export default function LoginScreen() {
         {/* Logo / cabecera */}
         <View style={styles.logoBox}>
           <View style={styles.logoCirc}>
-            <Ionicons name="library" size={54} color="#fff" />
+            <Ionicons name="book" size={44} color="#fff" />
           </View>
-          <Text style={styles.titulo}>Banco de Libro</Text>
-          <Text style={styles.subtitulo}>Biblioteca Comunitaria</Text>
+          <Text style={styles.titulo}>BiblioRed</Text>
+          <Text style={styles.subtitulo}>Panel de gestión</Text>
         </View>
 
         {/* Tarjeta de formulario */}
@@ -70,8 +72,8 @@ export default function LoginScreen() {
               value={usuario}
               onChangeText={setUsuario}
               autoCapitalize="none"
-              placeholder="admin"
-              placeholderTextColor="#aaa"
+              placeholder="usuario"
+              placeholderTextColor={colors.gray}
             />
           </View>
 
@@ -84,7 +86,7 @@ export default function LoginScreen() {
               onChangeText={setPassword}
               secureTextEntry={!verPass}
               placeholder="••••"
-              placeholderTextColor="#aaa"
+              placeholderTextColor={colors.gray}
             />
             <TouchableOpacity onPress={() => setVerPass(!verPass)}>
               <Ionicons name={verPass ? 'eye-off-outline' : 'eye-outline'} size={20} color={colors.gray} />
@@ -104,30 +106,31 @@ export default function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.primary },
-  scroll: { flexGrow: 1, justifyContent: 'center', padding: 24 },
-  cerrar: { position: 'absolute', top: 8, right: 8, padding: 8, zIndex: 1 },
-  logoBox: { alignItems: 'center', marginBottom: 26 },
-  logoCirc: {
-    width: 96, height: 96, borderRadius: 48, backgroundColor: '#ffffff22',
-    justifyContent: 'center', alignItems: 'center', marginBottom: 12,
-  },
-  titulo: { color: '#fff', fontSize: 26, fontWeight: 'bold' },
-  subtitulo: { color: '#d7e6e0', fontSize: 14, marginTop: 2 },
-  card: { backgroundColor: '#fff', borderRadius: 18, padding: 22 },
-  cardTitle: { fontSize: 18, fontWeight: 'bold', color: colors.text, marginBottom: 14 },
-  label: { fontSize: 13, color: colors.gray, marginBottom: 6, marginTop: 8 },
-  inputRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    borderWidth: 1, borderColor: colors.line, borderRadius: 10, paddingHorizontal: 12,
-  },
-  input: { flex: 1, paddingVertical: 12, fontSize: 15, color: colors.text },
-  error: { color: colors.danger, marginTop: 10, fontSize: 13 },
-  boton: {
-    backgroundColor: colors.primary, borderRadius: 10, paddingVertical: 14,
-    alignItems: 'center', marginTop: 18,
-  },
-  botonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
-  hint: { textAlign: 'center', color: colors.gray, fontSize: 12, marginTop: 14 },
-});
+const getStyles = (colors) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.primary },
+    scroll: { flexGrow: 1, justifyContent: 'center', padding: 24 },
+    cerrar: { position: 'absolute', top: 8, right: 8, padding: 8, zIndex: 1 },
+    logoBox: { alignItems: 'center', marginBottom: 26 },
+    logoCirc: {
+      width: 88, height: 88, borderRadius: 24, backgroundColor: '#ffffff22',
+      justifyContent: 'center', alignItems: 'center', marginBottom: 12,
+    },
+    titulo: { color: '#fff', fontSize: 26, fontWeight: 'bold' },
+    subtitulo: { color: '#e4dbfb', fontSize: 14, marginTop: 2 },
+    card: { backgroundColor: colors.card, borderRadius: 18, padding: 22, borderWidth: 1, borderColor: colors.line },
+    cardTitle: { fontSize: 18, fontWeight: 'bold', color: colors.text, marginBottom: 14 },
+    label: { fontSize: 13, color: colors.gray, marginBottom: 6, marginTop: 8 },
+    inputRow: {
+      flexDirection: 'row', alignItems: 'center', gap: 8,
+      borderWidth: 1, borderColor: colors.line, borderRadius: 10, paddingHorizontal: 12,
+    },
+    input: { flex: 1, paddingVertical: 12, fontSize: 15, color: colors.text },
+    error: { color: colors.danger, marginTop: 10, fontSize: 13 },
+    boton: {
+      backgroundColor: colors.primary, borderRadius: 10, paddingVertical: 14,
+      alignItems: 'center', marginTop: 18,
+    },
+    botonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+    hint: { textAlign: 'center', color: colors.gray, fontSize: 12, marginTop: 14 },
+  });

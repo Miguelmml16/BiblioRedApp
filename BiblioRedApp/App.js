@@ -1,5 +1,5 @@
-// Punto de entrada de la aplicación Banco de Libro.
-// Debe ir SIEMPRE al inicio para que el Drawer y los gestos funcionen:
+// Punto de entrada de la aplicación BiblioRed.
+// Debe ir SIEMPRE al inicio para que los gestos de navegación funcionen:
 import 'react-native-gesture-handler';
 
 import React from 'react';
@@ -8,18 +8,27 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 
 import { AuthProvider } from './src/context/AuthContext';
+import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 import RootNavigator from './src/navigation/RootNavigator';
+
+function AppShell() {
+  const { dark, colors } = useTheme();
+  return (
+    <AuthProvider>
+      <NavigationContainer>
+        <RootNavigator />
+      </NavigationContainer>
+      <StatusBar style={dark ? 'light' : 'dark'} backgroundColor={colors.bg} />
+    </AuthProvider>
+  );
+}
 
 export default function App() {
   return (
     <SafeAreaProvider>
-      {/* AuthProvider mantiene el estado de sesión en toda la app */}
-      <AuthProvider>
-        <NavigationContainer>
-          <RootNavigator />
-        </NavigationContainer>
-        <StatusBar style="light" />
-      </AuthProvider>
+      <ThemeProvider>
+        <AppShell />
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }

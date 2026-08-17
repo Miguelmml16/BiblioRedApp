@@ -129,7 +129,14 @@ export async function apiRequest(pathOrUrl, { method = 'GET', body } = {}) {
   if (body !== undefined) headers['Content-Type'] = 'application/json';
   const cookieHeader = buildCookieHeader();
   if (cookieHeader) headers['Cookie'] = cookieHeader;
-  if (csrfToken && method !== 'GET' && method !== 'HEAD') headers['X-CSRFToken'] = csrfToken;
+  if (csrfToken && method !== 'GET' && method !== 'HEAD') {
+    headers['X-CSRFToken'] = csrfToken;
+    // Django exige un Referer del mismo origen en peticiones HTTPS que
+    // modifican estado (chequeo CSRF adicional además del token); RN no lo
+    // manda solo, así que lo fijamos a mano o el backend responde 403
+    // "CSRF Failed: Referer checking failed - no Referer.".
+    headers['Referer'] = `${BASE_URL}/`;
+  }
 
   const response = await fetchWithTimeout(url, {
     method,
@@ -168,6 +175,8 @@ export async function apiRequest(pathOrUrl, { method = 'GET', body } = {}) {
 
 export const getJSON = (pathOrUrl) => apiRequest(pathOrUrl, { method: 'GET' });
 export const postJSON = (pathOrUrl, body) => apiRequest(pathOrUrl, { method: 'POST', body });
+export const patchJSON = (pathOrUrl, body) => apiRequest(pathOrUrl, { method: 'PATCH', body });
+export const deleteJSON = (pathOrUrl) => apiRequest(pathOrUrl, { method: 'DELETE' });
 
 // ---------------------------------------------------------------------------
 // Autenticación por sesión de Django (ver cabecera del archivo).
